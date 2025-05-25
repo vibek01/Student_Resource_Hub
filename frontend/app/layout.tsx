@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { ReactNode } from 'react' // ✅ import this
+import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 
 export const metadata = {
   title: 'Student Resource Hub',

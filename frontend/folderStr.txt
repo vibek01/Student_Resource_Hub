@@ -1,0 +1,26 @@
+frontend/
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx              <-- Landing page
+│   ├── globals.css
+│   ├── auth/
+│   │   ├── login/
+│   │   │   └── page.tsx      <-- Login Page
+│   │   └── signup/
+│   │       └── page.tsx      <-- Signup Page
+│   ├── dashboard/
+│   │   └── page.tsx          
+│   ├── upload/
+│   │   └── page.tsx          
+│   ├── resources/
+│   │   └── page.tsx          
+│   ├── components/
+│   │   └── Navbar.tsx          
+│   │   └── Footer.tsx          
+├── public/
+│   └── ...                   <-- Static files
+├── styles/
+│   └── ...                   <-- Global/custom styles if added
+├── tsconfig.json
+├── next.config.js
+└── package.json

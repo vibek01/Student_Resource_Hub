@@ -1,0 +1,18 @@
+backend/
+├── app/
+│   ├── __init__.py             <-- Flask app factory
+│   ├── config.py               <-- App configuration (MONGO_URI)
+│   ├── models/
+│   │   └── user_model.py       <-- User document generator
+│   │   └── resource_model.py
+│   ├── routes/
+│   │   ├── auth.py             <-- /api/auth/signup and /login
+│   │   ├── resources.py        <-- /api/resources/
+│   │   └── user.py             <-- /api/user/me (JWT protected)
+│   └── utils/
+│       └── jwt.py
+│   └── uploads/
+│       └── 
+├── venv/                       <-- Python virtual environment
+├── run.py                      <-- (Optional) App run file
+└── requirements.txt

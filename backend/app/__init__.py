@@ -1,19 +1,42 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
-from pymongo import MongoClient
+from pymongo import MongoClient, errors
 import os
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
 
+    # Load configuration from config.py
     app.config.from_pyfile('config.py')
-    app.mongo = MongoClient(app.config['MONGO_URI'])['student_resource_hub']
 
-    from app.routes.auth import auth_bp
-    from app.routes.resources import res_bp
+    # Enable CORS for frontend origin and support credentials (cookies)
+    CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
-    app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    app.register_blueprint(res_bp, url_prefix='/api/resources')
+    # MongoDB setup with error handling
+    try:
+        mongo_client = MongoClient(app.config['MONGO_URI'])
+        app.mongo = mongo_client['student_resource_hub']
+        print("✅ Connected to MongoDB")
+    except errors.ConnectionFailure as e:
+        print("❌ Could not connect to MongoDB:", e)
+
+    # Serve uploaded files statically
+    @app.route('/uploads/<path:filename>')
+    def uploaded_file(filename):
+        upload_folder = os.path.join(app.root_path, 'uploads')  # absolute path
+        return send_from_directory(upload_folder, filename)
+
+    # Import and register blueprints
+    try:
+        from app.routes.auth import auth_bp
+        from app.routes.resources import resources_bp
+        from app.routes.user import user_bp
+
+        app.register_blueprint(auth_bp, url_prefix='/api/auth')
+        app.register_blueprint(resources_bp, url_prefix='/api/resources')
+        app.register_blueprint(user_bp, url_prefix='/api/user')
+        print("✅ Blueprints registered successfully")
+    except Exception as e:
+        print("❌ Error registering blueprints:", e)
 
     return app
