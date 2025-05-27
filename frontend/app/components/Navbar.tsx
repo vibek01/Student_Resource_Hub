@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { usePathname } from 'next/navigation';
 
 const navVariants: Variants = {
   hidden: { opacity: 0, y: -30 },
@@ -16,13 +17,17 @@ const navVariants: Variants = {
 };
 
 export default function Navbar() {
+  const API = process.env.NEXT_PUBLIC_API_URL;
+  const pathname = usePathname();        // watch path changes
   const [userName, setUserName] = useState<string | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
+    // Re-fetch user status on initial load *and* whenever the path changes
+    setLoadingUser(true);
+    fetch(`${API}/api/user/me`, { credentials: 'include' })
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json();
@@ -30,7 +35,9 @@ export default function Navbar() {
       .then((data) => setUserName(data.name))
       .catch(() => setUserName(null))
       .finally(() => setLoadingUser(false));
+  }, [API, pathname]);
 
+  useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
@@ -51,12 +58,7 @@ export default function Navbar() {
     <nav className={navClasses}>
       <div className="flex justify-between items-center">
         {/* Logo */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={navVariants}
-          custom={0}
-        >
+        <motion.div initial="hidden" animate="visible" variants={navVariants} custom={0}>
           <Link href="/" className="flex items-center gap-2">
             <motion.span
               whileHover={{ scale: 1.03 }}
@@ -86,7 +88,6 @@ export default function Navbar() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all"
               >
                 <span className="font-medium text-white">Hi, {userName}</span>
-                {/* ← re-added green dot */}
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
               </Link>
             </motion.div>
@@ -125,10 +126,7 @@ export default function Navbar() {
             transition={{ duration: 0.2 }}
             onClick={() => setMenuOpen(false)}
           >
-            {/* Backdrop (below panel) */}
             <div className="absolute inset-0 bg-black/60 z-10" />
-
-            {/* Side panel (above backdrop) */}
             <motion.div
               className="ml-auto w-3/4 max-w-xs h-full bg-gradient-to-br from-gray-800 to-black text-white p-6 z-20"
               initial={{ x: '100%' }}
@@ -150,23 +148,14 @@ export default function Navbar() {
                   </div>
                 </button>
               </div>
-
               <ul className="space-y-4">
                 <li>
-                  <Link
-                    href="/resources"
-                    className="block text-xl py-2"
-                    onClick={() => setMenuOpen(false)}
-                  >
+                  <Link href="/resources" className="block text-xl py-2" onClick={() => setMenuOpen(false)}>
                     Resources
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/upload"
-                    className="block text-xl py-2"
-                    onClick={() => setMenuOpen(false)}
-                  >
+                  <Link href="/upload" className="block text-xl py-2" onClick={() => setMenuOpen(false)}>
                     Upload
                   </Link>
                 </li>
@@ -174,31 +163,19 @@ export default function Navbar() {
                   <li><Loader /></li>
                 ) : userName ? (
                   <li>
-                    <Link
-                      href="/dashboard"
-                      className="block text-xl py-2"
-                      onClick={() => setMenuOpen(false)}
-                    >
+                    <Link href="/dashboard" className="block text-xl py-2" onClick={() => setMenuOpen(false)}>
                       Hi, {userName}
                     </Link>
                   </li>
                 ) : (
                   <>
                     <li>
-                      <Link
-                        href="/auth/login"
-                        className="block text-xl py-2"
-                        onClick={() => setMenuOpen(false)}
-                      >
+                      <Link href="/auth/login" className="block text-xl py-2" onClick={() => setMenuOpen(false)}>
                         Login
                       </Link>
                     </li>
                     <li>
-                      <Link
-                        href="/auth/signup"
-                        className="block text-xl py-2"
-                        onClick={() => setMenuOpen(false)}
-                      >
+                      <Link href="/auth/signup" className="block text-xl py-2" onClick={() => setMenuOpen(false)}>
                         Signup
                       </Link>
                     </li>
