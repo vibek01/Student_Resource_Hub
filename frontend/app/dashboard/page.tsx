@@ -20,6 +20,7 @@ type Resource = {
 };
 
 export default function DashboardPage() {
+  const API = process.env.NEXT_PUBLIC_API_URL;
   const [user, setUser] = useState<User | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
   const [bookmarks, setBookmarks] = useState<Resource[]>([]);
@@ -29,7 +30,7 @@ export default function DashboardPage() {
   const [loadingBookmarks, setLoadingBookmarks] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
+    fetch(`${API}/api/user/me`, { credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) throw new Error('Failed to fetch user');
         return res.json();
@@ -38,7 +39,7 @@ export default function DashboardPage() {
         setUser(userData);
         setLoadingUser(false);
 
-        fetch(`http://localhost:5000/api/resources/list?uploaded_by=${userData._id}`, {
+        fetch(`${API}/api/resources/list?uploaded_by=${userData._id}`, {
           credentials: 'include',
         })
           .then(async (res) => {
@@ -54,7 +55,7 @@ export default function DashboardPage() {
             setLoadingResources(false);
           });
 
-        fetch('http://localhost:5000/api/user/bookmarks', {
+        fetch(`${API}/api/user/bookmarks`, {
           credentials: 'include',
         })
           .then(async (res) => {
@@ -76,11 +77,11 @@ export default function DashboardPage() {
         setLoadingResources(false);
         setLoadingBookmarks(false);
       });
-  }, []);
+  }, [API]);
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/logout', {
+      const res = await fetch(`${API}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include',
       });

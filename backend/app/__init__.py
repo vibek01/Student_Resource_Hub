@@ -6,27 +6,28 @@ import os
 def create_app():
     app = Flask(__name__)
 
-    # Load configuration from config.py
+    # Load configuration
     app.config.from_pyfile('config.py')
 
-    # Enable CORS for frontend origin and support credentials (cookies)
+    # Enable CORS (frontend: localhost:3000)
     CORS(app, origins="http://localhost:3000", supports_credentials=True)
 
-    # MongoDB setup with error handling
+    # Connect to MongoDB Atlas
     try:
         mongo_client = MongoClient(app.config['MONGO_URI'])
-        app.mongo = mongo_client['student_resource_hub']
-        print("✅ Connected to MongoDB")
+        # student_resource_hub will be created if it doesn’t exist yet
+        app.mongo = mongo_client.get_database()  # Uses db from URI
+        print("✅ Connected to MongoDB Atlas")
     except errors.ConnectionFailure as e:
-        print("❌ Could not connect to MongoDB:", e)
+        print("❌ MongoDB Connection Failed:", e)
 
-    # Serve uploaded files statically
+    # Serve uploaded files
     @app.route('/uploads/<path:filename>')
     def uploaded_file(filename):
-        upload_folder = os.path.join(app.root_path, 'uploads')  # absolute path
+        upload_folder = os.path.join(app.root_path, 'uploads')
         return send_from_directory(upload_folder, filename)
 
-    # Import and register blueprints
+    # Register routes
     try:
         from app.routes.auth import auth_bp
         from app.routes.resources import resources_bp

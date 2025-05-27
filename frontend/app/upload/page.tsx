@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
+const API = process.env.NEXT_PUBLIC_API_URL
+
 const ALL_CATEGORIES = [
   "AI", "Web", "ML", "DL", "Blockchain", "Cybersecurity", "Cloud",
   "DevOps", "React", "Next.js", "Node.js", "Python", "Flask", "Django",
@@ -26,7 +28,7 @@ export default function UploadResource() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/user/me', {
+        const res = await fetch(`${API}/api/user/me`, {
           credentials: 'include',
         })
         if (!res.ok) throw new Error('Not logged in')
@@ -37,7 +39,7 @@ export default function UploadResource() {
       }
     }
     fetchUser()
-  }, [])
+  }, [API])
 
   const toggleCategory = (cat: string) => {
     setSelectedCategories(prev => {
@@ -71,7 +73,7 @@ export default function UploadResource() {
     formData.append('user_id', userId)
 
     try {
-      const res = await fetch('http://localhost:5000/api/resources/upload', {
+      const res = await fetch(`${API}/api/resources/upload`, {
         method: 'POST',
         credentials: 'include',
         body: formData,

@@ -1,2 +1,2 @@
-MONGO_URI = "mongodb://localhost:27017/"
-SECRET_KEY = "supersecretkey"  # Use .env in production
+MONGO_URI = "mongodb+srv://binforpc:VibekThemeMongo06@cluster1.0jpia.mongodb.net/student_resource_hub?retryWrites=true&w=majority&appName=Cluster1"
+SECRET_KEY = "supersecretkey"  # Use .env for production

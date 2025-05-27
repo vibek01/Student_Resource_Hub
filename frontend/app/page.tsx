@@ -15,12 +15,13 @@ type CircleProps = {
 }
 
 export default function Home() {
+  const API = process.env.NEXT_PUBLIC_API_URL
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 })
   const [userName, setUserName] = useState<string | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
   const [circles, setCircles] = useState<CircleProps[]>([])
 
-  // Track mouse for the cursor follower
+  // Track mouse
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) =>
       setCursorPosition({ x: e.clientX, y: e.clientY })
@@ -28,7 +29,7 @@ export default function Home() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Generate animation circles only on client
+  // Background circles
   useEffect(() => {
     const newCircles: CircleProps[] = Array.from({ length: 10 }).map(() => ({
       width: Math.random() * 100 + 50,
@@ -43,7 +44,7 @@ export default function Home() {
 
   // Fetch current user
   useEffect(() => {
-    fetch('http://localhost:5000/api/user/me', { credentials: 'include' })
+    fetch(`${API}/api/user/me`, { credentials: 'include' })
       .then(res => {
         if (!res.ok) throw new Error('Not authenticated')
         return res.json()
@@ -51,7 +52,7 @@ export default function Home() {
       .then(data => setUserName(data.name))
       .catch(() => setUserName(null))
       .finally(() => setLoadingUser(false))
-  }, [])
+  }, [API])
 
   const features = [
     {
@@ -139,7 +140,7 @@ export default function Home() {
             with students worldwide.
           </motion.p>
 
-          {/* Conditional Buttons */}
+          {/* Conditionally show buttons */}
           {loadingUser ? (
             <Loader />
           ) : userName ? (

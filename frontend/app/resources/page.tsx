@@ -15,21 +15,23 @@ interface Resource {
 }
 
 export default function ResourceList() {
+  const API = process.env.NEXT_PUBLIC_API_URL
   const [resources, setResources] = useState<Resource[]>([])
   const [allResources, setAllResources] = useState<Resource[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [fileType, setFileType] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     fetchResources()
     fetchUser()
-  }, [])
+  }, [API])
 
   const fetchUser = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/user/me', {
+      const res = await fetch(`${API}/api/user/me`, {
         credentials: 'include',
       })
       if (!res.ok) throw new Error()
@@ -41,7 +43,7 @@ export default function ResourceList() {
   }
 
   const fetchResources = async () => {
-    const res = await fetch('http://localhost:5000/api/resources/list')
+    const res = await fetch(`${API}/api/resources/list`)
     const data = await res.json()
     setResources(data)
     setAllResources(data)
@@ -85,13 +87,13 @@ export default function ResourceList() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/user/bookmark/${resId}`, {
+      const res = await fetch(`${API}/api/user/bookmark/${resId}`, {
         method: 'POST',
         credentials: 'include',
       })
       const data = await res.json()
       if (res.ok) {
-        // Update local state bookmark list based on backend response
+        // Update local state bookmark list
         setResources((prev) =>
           prev.map((r) =>
             r._id === resId
@@ -164,7 +166,8 @@ export default function ResourceList() {
 
             <div className="text-sm text-gray-400 space-y-1 mb-3">
               <p>
-                <span className="font-medium text-violet-300">Type:</span> {res.file_type.toUpperCase()}
+                <span className="font-medium text-violet-300">Type:</span>{' '}
+                {res.file_type.toUpperCase()}
               </p>
               <p>
                 <span className="font-medium text-violet-300">Uploaded:</span>{' '}
@@ -189,9 +192,15 @@ export default function ResourceList() {
                 <button
                   onClick={() => handleBookmark(res._id)}
                   className="text-sm bg-violet-600 hover:bg-violet-700 text-white px-4 py-1.5 rounded-md shadow transition-all"
-                  aria-label={res.bookmarked_by?.includes(userId) ? 'Remove bookmark' : 'Add bookmark'}
+                  aria-label={
+                    res.bookmarked_by?.includes(userId)
+                      ? 'Remove bookmark'
+                      : 'Add bookmark'
+                  }
                 >
-                  {res.bookmarked_by?.includes(userId) ? 'Remove Bookmark' : 'Add Bookmark'}
+                  {res.bookmarked_by?.includes(userId)
+                    ? 'Remove Bookmark'
+                    : 'Add Bookmark'}
                 </button>
               </div>
             )}
