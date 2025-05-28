@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 
 interface Resource {
   _id: string
@@ -16,12 +17,15 @@ interface Resource {
 
 export default function ResourceList() {
   const API = process.env.NEXT_PUBLIC_API_URL
-  const [resources, setResources] = useState<Resource[]>([])
   const [allResources, setAllResources] = useState<Resource[]>([])
+  const [resources, setResources] = useState<Resource[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [fileType, setFileType] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 10
+  const totalPages = Math.ceil(resources.length / pageSize)
   const router = useRouter()
 
   useEffect(() => {
@@ -45,8 +49,8 @@ export default function ResourceList() {
   const fetchResources = async () => {
     const res = await fetch(`${API}/api/resources/list`)
     const data = await res.json()
-    setResources(data)
     setAllResources(data)
+    setResources(data)
   }
 
   const filterResources = () => {
@@ -54,7 +58,9 @@ export default function ResourceList() {
     const q = searchQuery.toLowerCase()
 
     if (fileType) {
-      filtered = filtered.filter((r) => r.file_type.toLowerCase() === fileType)
+      filtered = filtered.filter(
+        (r) => r.file_type.toLowerCase() === fileType
+      )
     }
 
     if (searchQuery) {
@@ -68,6 +74,7 @@ export default function ResourceList() {
     }
 
     setResources(filtered)
+    setCurrentPage(1)
   }
 
   useEffect(() => {
@@ -85,7 +92,6 @@ export default function ResourceList() {
       alert('Please log in to bookmark.')
       return
     }
-
     try {
       const res = await fetch(`${API}/api/user/bookmark/${resId}`, {
         method: 'POST',
@@ -93,7 +99,6 @@ export default function ResourceList() {
       })
       const data = await res.json()
       if (res.ok) {
-        // Update local state bookmark list
         setResources((prev) =>
           prev.map((r) =>
             r._id === resId
@@ -113,6 +118,12 @@ export default function ResourceList() {
       alert('Error updating bookmark')
     }
   }
+
+  // resources to display on this page
+  const paginated = resources.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
 
   return (
     <div className="max-w-6xl mx-auto px-4 pt-28 pb-12 text-white">
@@ -145,7 +156,7 @@ export default function ResourceList() {
       </div>
 
       <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 animate-fade-in">
-        {resources.map((res) => (
+        {paginated.map((res) => (
           <div
             key={res._id}
             className="relative bg-gradient-to-br from-slate-900 via-violet-950 to-slate-900 border border-violet-800/30 shadow-[0_8px_30px_rgb(78,70,120,0.2)] rounded-2xl p-6 transition-transform duration-300 hover:scale-[1.02] hover:shadow-purple-800/50 backdrop-blur-xl bg-opacity-60"
@@ -161,7 +172,9 @@ export default function ResourceList() {
               ))}
             </div>
 
-            <h3 className="text-2xl font-semibold mb-2 text-violet-200">{res.title}</h3>
+            <h3 className="text-2xl font-semibold mb-2 text-violet-200">
+              {res.title}
+            </h3>
             <p className="text-violet-100 mb-3">{res.description}</p>
 
             <div className="text-sm text-gray-400 space-y-1 mb-3">
@@ -207,6 +220,43 @@ export default function ResourceList() {
           </div>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-6 mt-8">
+          <motion.button
+            onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+            disabled={currentPage === 1}
+            whileHover={currentPage > 1 ? { scale: 1.05 } : {}}
+            className={`px-4 py-2 rounded-full text-white font-medium shadow transition-transform ${
+              currentPage === 1
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-violet-600 hover:bg-violet-700'
+            }`}
+          >
+            Previous
+          </motion.button>
+
+          <span className="text-white">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <motion.button
+            onClick={() =>
+              setCurrentPage((p) => Math.min(p + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            whileHover={currentPage < totalPages ? { scale: 1.05 } : {}}
+            className={`px-4 py-2 rounded-full text-white font-medium shadow transition-transform ${
+              currentPage === totalPages
+                ? 'bg-gray-600 cursor-not-allowed'
+                : 'bg-violet-600 hover:bg-violet-700'
+            }`}
+          >
+            Next
+          </motion.button>
+        </div>
+      )}
     </div>
   )
 }

@@ -11,9 +11,8 @@ def create_app():
     # Load configuration
     app.config.from_pyfile('config.py')
 
-    # Enable CORS (frontend: localhost:3000)
-    # CORS(app, origins="http://localhost:3000", supports_credentials=True)
-    CORS(app, origins="https://student-resource-hub-nu.vercel.app/", supports_credentials=True)
+    # Enable CORS (frontend)
+    CORS(app, origins="https://stellar-marzipan-9c0d97.netlify.app", supports_credentials=True)
 
     # Connect to MongoDB Atlas
     try:

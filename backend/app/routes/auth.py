@@ -50,8 +50,8 @@ def login():
         'token',
         token,
         httponly=True,
-        secure=False,  # Set to True in production with HTTPS
-        samesite='Lax',
+        secure=True,  # Set to True in production with HTTPS
+        samesite='None',
         max_age=7 * 24 * 3600  # 7 days
     )
 

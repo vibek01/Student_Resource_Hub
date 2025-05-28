@@ -47,11 +47,6 @@ To provide a collaborative platform where students can share valuable educationa
 
 ---
 
-## 📦 Folder Structure (Simplified)
-
-
----
-
 ## 🔐 Authentication
 
 - JWT is issued at login and stored as an HTTP-only cookie.
@@ -59,8 +54,6 @@ To provide a collaborative platform where students can share valuable educationa
 - Bookmarks, dashboard, and resource uploads are **only available to authenticated users**.
 
 ---
-
-## 🧪 Getting Started (Local Setup)
 
 ### ⚙️ Backend (Flask)
 
@@ -76,6 +69,7 @@ npm install
 npm run dev
 
 #Nextjs #TypeScript #TailwindCSS #MongoDB #Flask #FullStack #JWTAuth #PDFViewer #StudentPlatform
+```
 
 📌 Future Enhancements
 🛡️ Admin dashboard for resource moderation
